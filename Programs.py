@@ -1,23 +1,42 @@
 import pygame
 
 class programs:
-    @staticmethod
-    def add_window(func, screen, color, pos_object, radius):
-        value = (
-            lambda: func(screen, color, pos_object, radius),
-            lambda: "move",
-            (pos_object[0], pos_object[1], radius, color) if str(func) == "<built-in function circle>" else (pos_object[0], pos_object[1], pos_object[2], pos_object[3], color)
-        )
-        return value
+    pass
 
-    @staticmethod
-    def add_panel_pusk(screen, colors, func):
-        value = [
-            ["rect1", lambda: func(pygame.draw.rect, screen, colors["white"], (200, 200, 20, 20), 2)],
-            ["rect2", lambda: func(pygame.draw.rect, screen, colors["white"], (200, 200, 10, 10), 2)],
-            ["rect3", lambda: func(pygame.draw.rect, screen, colors["white"], (200, 200, 5, 5), 2)]
-        ]
-        return value
+
+
+
+class window:
+    width = None
+    height = None
+    x = None
+    y = None
+
+    border = None
+
+    color = None
+    screen = None
+
+
+    def __init__(self, width, height, x, y, border, color, screen, com):
+        self.width = width
+        self.height = height
+        self.x = x
+        self.y = y
+
+        self.border = border
+
+        self.color = color
+        self.screen = screen
+        self.com = com
+
+    def otr(self):
+        pygame.draw.rect(self.screen, self.color, (self.x, self.y, self.width, self.height), self.border)
+
+    def check_tap(self, pos_cursor):
+        if self.x < pos_cursor[0] < (self.x + self.width) and self.y < pos_cursor[1] < self.y + self.height:
+            self.com()
+
 
 
     
