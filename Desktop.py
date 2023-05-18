@@ -24,6 +24,7 @@ class Desktop(Programs.programs):
 
 
     def __init__(self):
+        # evev
 
         Programs.programs.__init__(self)
 
