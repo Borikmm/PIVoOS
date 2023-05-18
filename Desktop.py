@@ -28,23 +28,28 @@ class Desktop(Programs.programs):
         Programs.programs.__init__(self)
 
         # for debuging
-        self.screen = pygame.display.set_mode((800, 800))
+        self.screen = pygame.display.set_mode((800, 800))#, pygame.FULLSCREEN)
         self.screen.fill(THECOLORS['black'])
 
-        clock = pygame.time.Clock()
         self.draw = False
 
-        self.font = pygame.font.Font(None, 25)
+        pan1 = Programs.Panel(200, 500, 200, 100, 2, self.color["green"], self.screen)
+        win1 = [Programs.window(100, 100, 300, 100, 2, self.color["red"], self.screen, lambda: pan1.change(False)),
+                Programs.window(100, 100, 300, 400, 2, self.color["blue"], self.screen, lambda: exit()),
+                Programs.window(100, 100, 300, 200, 2, self.color["red"], self.screen, lambda: print("hello world"))]
+        pan1.window = win1
+        pan1.DRAW = True
 
-        win1 = [Programs.window(100, 100, 200, 300, 2, self.color["red"], self.screen, lambda: print("hello world")),
-                Programs.window(100, 100, 300, 400, 2, self.color["blue"], self.screen, lambda: print("hello world")),
-                Programs.window(100, 100, 100, 200, 2, self.color["red"], self.screen, lambda: print("hello world"))]
+        labels = [
+            Programs.window(100, 100, 0, 700, 2, self.color["red"], self.screen, lambda: pan1.change(True))
+        ]
 
 
         while True:
-            clock.tick(180)
+            pygame.time.Clock().tick(180)
 
-            for i in win1:
+            pan1.otr()
+            for i in labels:
                 i.otr()
 
 
@@ -69,7 +74,8 @@ class Desktop(Programs.programs):
                         self.draw = False
 
                 if self.draw:
-                    for i in win1:
+                    pan1.check_tap(event.pos)
+                    for i in labels:
                         i.check_tap(event.pos)
 
             pygame.display.flip()
