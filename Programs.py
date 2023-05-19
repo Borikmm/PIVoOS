@@ -1,5 +1,5 @@
 import pygame
-
+from numba import prange
 color = {
     "black": [0, 0, 0],
     "white": [255, 255, 255],
@@ -49,6 +49,16 @@ class window:
 
 
 
+
+
+
+
+
+
+
+
+
+
 class Panel:
 
     window = None
@@ -79,6 +89,25 @@ class Panel:
 
     def change(self, per: bool):
         self.DRAW = per
+
+
+class Calculator(window, Panel):
+    def __init__(self, x, y, width, height, margin):
+        self.x, self.y, self.width, self.height, self.margin = x + margin, y + margin, width, height, margin
+
+
+    def create_subwindows(self, screen):
+        result = []
+        for i in prange(1, 10):
+            result.append(window(self.x, self.y, self.width, self.height, 3, color["red"], screen, lambda: Panel().change(True), f"{i}-blue"))
+            if i in (3,6,9): self.y = self.height + self.margin
+            self.x = self.width + self.margin
+
+        return result
+
+    def __call__(self, *args, **kwargs):
+        return self.create_subwindows(*args)
+
 
 
 

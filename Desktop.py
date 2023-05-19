@@ -4,6 +4,7 @@ import time
 import random
 from pygame.color import THECOLORS
 import Programs
+from numba import prange
 
 # for debigung
 pygame.init()
@@ -16,10 +17,9 @@ class Desktop(Programs.programs):
         "green": [0, 255, 0],
         "blue": [0, 0, 255]
     }
-
+    margin = 180
     FIXED_FRAME = 2
     test = False
-
 
 
 
@@ -43,11 +43,20 @@ class Desktop(Programs.programs):
         pan1.window = win1
         pan1.DRAW = False
 
+        pan2 = Programs.Panel(150, 100, 500, 500, 2, self.color["green"], self.screen)
+        win2 = Programs.Calculator(150, 100, 50, 50, 50)(self.screen)
+        pan2.window = win2
+        pan2.DRAW = False
+
+
 
 
         main_panel = Programs.Panel(x=0, y=700, width=700, height=100, border=3, color=self.color["green"], screen=self.screen)
         win_main_panel = [
-            Programs.window(0, 700, 100, 100, 3, self.color["red"], self.screen, lambda: pan1.change(True), "деньги-blue")
+            Programs.window(0, 700, 100, 100, 3, self.color["red"], self.screen, lambda: pan1.change(True), "деньги-blue"),
+            Programs.window(500, 700, 100, 100, 3, self.color["red"], self.screen, lambda: pan2.change(True),
+                            "calc-blue")
+
         ]
         main_panel.window = win_main_panel
         main_panel.DRAW = True
@@ -55,7 +64,7 @@ class Desktop(Programs.programs):
 
         while True:
             pygame.time.Clock().tick(180)
-
+            pan2.otr()
             pan1.otr()
             main_panel.otr()
 
@@ -74,6 +83,7 @@ class Desktop(Programs.programs):
                     self.pos_cursor = event.pos
                     if event.button == 1:
                         pan1.check_tap(event.pos)
+                        pan2.check_tap(event.pos)
                         main_panel.check_tap(event.pos)
 
                 if event.type == pygame.MOUSEBUTTONUP:
