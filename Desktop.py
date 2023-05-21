@@ -4,7 +4,6 @@ import time
 import random
 from pygame.color import THECOLORS
 import Programs
-from numba import prange
 
 # for debigung
 pygame.init()
@@ -24,9 +23,7 @@ class Desktop(Programs.programs):
 
 
     def __init__(self):
-        # evev
-
-        Programs.programs.__init__(self)
+        super().__init__()
 
         # start parametres for window
         self.screen = pygame.display.set_mode((800, 800))#, pygame.FULLSCREEN)
@@ -34,27 +31,22 @@ class Desktop(Programs.programs):
         # background color
         self.screen.fill(THECOLORS['black'])
 
-
-
-        pan1 = Programs.Panel(200, 100, 200, 500, 2, self.color["green"], self.screen)
-        win1 = [Programs.window(300, 100, 100, 100,  2, self.color["red"], self.screen, lambda: pan1.change(False), "close-red"),
-                Programs.window(300, 400, 100, 100, 2, self.color["blue"], self.screen, lambda: exit(), "exit-red"),
-                Programs.window(300, 200, 100, 100, 2, self.color["red"], self.screen, lambda: print("hello world"))]
+        pan1 = Programs.Panel(200, 100, 200, 500, 0, self.color["white"], self.screen, True)
+        win1 = [Programs.Window(300, 400, 100, 100, 2, self.color["blue"], self.screen, lambda: exit(), "exit-red"),
+                Programs.Window(300, 200, 100, 100, 2, self.color["red"], self.screen, lambda: print("hello world"))]
         pan1.window = win1
         pan1.DRAW = False
 
-        pan2 = Programs.Panel(150, 100, 500, 500, 2, self.color["green"], self.screen)
+        calculation = Programs.Panel(150, 100, 500, 500, 0, self.color["green"], self.screen, True)
         win2 = Programs.Calculator(150, 100, 50, 50, 50)(self.screen)
-        pan2.window = win2
-        pan2.DRAW = False
+        calculation.window = win2
+        calculation.DRAW = False
 
 
-
-
-        main_panel = Programs.Panel(x=0, y=700, width=700, height=100, border=3, color=self.color["green"], screen=self.screen)
+        main_panel = Programs.Panel(x=0, y=700, width=700, height=100, border=0, color=self.color["green"], screen=self.screen, st_lb=False)
         win_main_panel = [
-            Programs.window(0, 700, 100, 100, 3, self.color["red"], self.screen, lambda: pan1.change(True), "деньги-blue"),
-            Programs.window(500, 700, 100, 100, 3, self.color["red"], self.screen, lambda: pan2.change(True),
+            Programs.Window(0, 700, 100, 100, 0, self.color["red"], self.screen, lambda: pan1.change(True), "деньги-blue"),
+            Programs.Window(500, 700, 100, 100, 0, self.color["red"], self.screen, lambda: calculation.change(True),
                             "calc-blue")
 
         ]
@@ -64,7 +56,8 @@ class Desktop(Programs.programs):
 
         while True:
             pygame.time.Clock().tick(180)
-            pan2.otr()
+
+            calculation.otr()
             pan1.otr()
             main_panel.otr()
 
@@ -83,7 +76,7 @@ class Desktop(Programs.programs):
                     self.pos_cursor = event.pos
                     if event.button == 1:
                         pan1.check_tap(event.pos)
-                        pan2.check_tap(event.pos)
+                        calculation.check_tap(event.pos)
                         main_panel.check_tap(event.pos)
 
                 if event.type == pygame.MOUSEBUTTONUP:
