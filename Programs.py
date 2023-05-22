@@ -40,12 +40,12 @@ class Window:
             font_rect.center = border.center
             self.screen.blit(text, font_rect)
 
-    def check_tap(self, pos_cursor):
+    def check_tap(self, pos_cursor, pos2=None, draw=None):
         if self.x < pos_cursor[0] < (self.x + self.width) and self.y < pos_cursor[1] < self.y + self.height:
             try:
                 self.command()
             except TypeError:
-                self.command(pos_cursor)
+                self.command(pos_cursor, pos2, draw)
 
 class Panel:
 
@@ -63,8 +63,8 @@ class Panel:
         self.color = color
         self.screen = screen
 
-        self.standart_labels = [Window(self.x, self.y, self.width*0.75, self.height*0.10,  0, COLOR["green"], self.screen, lambda pos_cursor: self.move(pos_cursor)),
-                                Window(self.x+(self.width*0.75), self.y, self.width*0.25, self.height*0.10, 0, COLOR["red"], self.screen, lambda: self.change(False))
+        self.standart_labels = [Window(self.x, self.y, self.width-50, self.height*0.10,  0, COLOR["green"], self.screen, lambda pos_cursor, pos2, move: self.move(pos_cursor, pos2, move)),
+                                Window(self.x+(self.width-50), self.y, 50, self.height*0.10, 0, COLOR["red"], self.screen, lambda: self.change(False))
                                 ] if st_lb else []
 
     def otr(self):
@@ -73,10 +73,10 @@ class Panel:
             for i in self.window:
                 i.otr()
 
-    def check_tap(self, pos_cursor):
+    def check_tap(self, pos_cursor, pos2, draw):
         if self.DRAW:
             for i in self.window:
-                i.check_tap(pos_cursor)
+                i.check_tap(pos_cursor, pos2, draw)
 
     def change(self, per: bool):
         self.DRAW = per
@@ -88,30 +88,58 @@ class Panel:
             object.__setattr__(self, key, value)
 
 
-    def move(self, pos_cursor):
-        x = pos_cursor[0]
-        y = pos_cursor[1]
+    def move(self, pos_cursor, pos_2, draw):
+        if draw:
+            self.x11 = self.x
+            self.y11 = self.y
 
-        self.x = x
-        self.y = y
-        for win in self.window:
-            win.x = win.x - x
-            win.y = win.y + y
+        self.x = pos_cursor[0] + (self.x11 - pos_2[0])
+        self.y = pos_cursor[1] + (self.y11 - pos_2[1])
 
+        for num, win in enumerate(self.window):
+            if draw:
+                exec("self.x{} = win.x".format(num))
+                exec("self.y{} = win.y".format(num))
+
+            win.x = pos_cursor[0] + (eval("self.x{}".format(num)) - pos_2[0])
+            win.y = pos_cursor[1] + (eval("self.y{}".format(num)) - pos_2[1])
 
 class Calculator(Window, Panel):
-    def __init__(self, x, y, width, height, margin):
-        self.x, self.y, self.width, self.height, self.margin = x + margin, y + margin, width, height, margin
+    base_x, base_y = [0, 0]
 
+    def __init__(self, x, y, width, height, margin):
+        self.base_x, self.base_y = x, y
+        self.x, self.y, self.width, self.height, self.margin = self.base_x, self.base_y, width, height, margin
+
+    executor, result_calculate = "", ""
 
     def create_subwindows(self, screen):
-        result = []
+        result, tools, sym = [], [], (" Plus ", " Minus ", " Equal ")
         for i in range(1, 10):
-            result.append(Window(self.x, self.y, self.width, self.height, 3, COLOR["red"], screen, lambda: Panel().change(True), f"{i}-blue"))
-            if i in (3,6,9): self.y = self.height + self.margin
-            self.x = self.width + self.margin
+            result.append(Window(x=self.x, y=self.y, width=self.width, height=self.height, border=3, color=COLOR["red"],
+                                 screen=screen, command=lambda i=i: print(i), text=f"{i}-blue"))
+            if i % 3 == 0:
+                tools.append((self.x, self.y))
+                self.y, self.x = self.height + self.margin + self.y, self.base_x
+            else:
+                self.x = self.width + self.margin + self.x
 
         return result
+
+    @classmethod
+    def calculate(cls, choice):
+        if choice.isdigit(): cls.executor += choice
+
+        match choice:
+            case " Plus ":
+                cls.executor += " + "
+            case " Minus ":
+                cls.executor += " - "
+            case " Equal ":
+                if len(cls.executor.split(' ')) == 5:
+                    exec("a =" + f"{cls.executor}")
+                    print(a)
+        #print(cls.executor.split(' '))
 
     def __call__(self, *args, **kwargs):
         return self.create_subwindows(*args)
@@ -120,5 +148,4 @@ class Calculator(Window, Panel):
 
 
 
-    
 
