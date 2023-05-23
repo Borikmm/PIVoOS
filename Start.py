@@ -1,36 +1,33 @@
-import random
 import pygame
-WIDTH, HEIGHT = 320, 240
-pygame.init()
-pygame.font.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-# use the first available font
-font = pygame.font.SysFont(pygame.font.get_fonts()[0], 60)
-pygame.display.set_caption("Centering Font Rect")
 
-text = "maner"
-widget = font.render(text, True, pygame.Color("seagreen"))
-border = pygame.Rect(10, 10, WIDTH - 40, HEIGHT - 40)
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            # change the text
-            text = random.choice(["Short", "Long Looooong", ".", "+++", "ABC"])
-            widget = font.render(text, True, pygame.Color("purple"))
-        elif event.type == pygame.MOUSEWHEEL:
-            # enlarge or shrink the border rect
-            border.inflate_ip(event.y, event.y)
-    screen.fill(pygame.Color("turquoise"))
-    # draw border rect
-    pygame.draw.rect(screen, pygame.Color("red"), border, width=1)
-    # get the current font rect
-    font_rect = widget.get_rect()
-    # move rect to be centered on border rect
-    font_rect.center = border.center
-    screen.blit(widget, font_rect)
-    # update display
-    pygame.display.update()
-pygame.quit()
+
+
+class LoadingScreen:
+    def __init__(self, background_image_path, screen_size=(800, 600), font_size=36):
+        pygame.init()
+        self.screen = pygame.display.set_mode(screen_size)
+        self.background_image = pygame.image.load(background_image_path).convert()
+        self.font = pygame.font.Font(None, font_size)
+
+    def show_loading_screen(self):
+        text = self.font.render("Loading...", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(self.screen.get_width()/2, self.screen.get_height()/2))
+        self.screen.blit(self.background_image, (0, 0))
+        self.screen.blit(text, text_rect)
+        pygame.display.flip()
+
+    def show_progress(self, progress):
+        progress_text = self.font.render(f"Loading... {progress}%", True, (255, 255, 255))
+        progress_rect = progress_text.get_rect(center=(self.screen.get_width()/2, self.screen.get_height()/2))
+        self.screen.blit(self.background_image, (0, 0))
+        self.screen.blit(progress_text, progress_rect)
+        pygame.display.flip()
+
+    def run_loading(self):
+        self.show_loading_screen()
+        for i in range(10):
+            pygame.time.delay(500)
+            self.show_progress(i*10)
+        pygame.quit()
+
+loading_screen = LoadingScreen("background.png")

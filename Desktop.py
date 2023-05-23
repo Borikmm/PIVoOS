@@ -18,7 +18,8 @@ class Desktop(Programs.programs):
         "white": [255, 255, 255],
         "red": [255, 0, 0],
         "green": [0, 255, 0],
-        "blue": [0, 0, 255]
+        "blue": [0, 0, 255],
+        "custom1": [123, 32, 200]
     }
     margin = 180
     FIXED_FRAME = 2
@@ -29,6 +30,7 @@ class Desktop(Programs.programs):
 
     def __init__(self):
         super().__init__()
+        pygame.init()
 
         # start parametres for window
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)#, pygame.FULLSCREEN)
@@ -44,17 +46,17 @@ class Desktop(Programs.programs):
         pan1.window = win1
         pan1.DRAW = False
 
-        calculation = Programs.Panel(150, 100, 500, 500, 0, self.color["green"], self.screen, True)
-        win2 = Programs.Calculator(150, 100, 50, 50, 50).create_subwindows(self.screen)
+        calculation = Programs.Panel(150, 100, 500, 500, 0, self.color["white"], self.screen, True)
+        win2 = Programs.Calculator(200, 250, 60, 60, 20, self.screen)()
         calculation.window = win2
         calculation.DRAW = False
 
 
-        main_panel = Programs.Panel(x=0, y=self.dysplay_hight-80, width=self.dysplay_width, height=80, border=0, color=self.color["green"], screen=self.screen, st_lb=False)
+        main_panel = Programs.Panel(x=0, y=self.dysplay_hight-80, width=self.dysplay_width, height=80, border=0, color=self.color["white"], screen=self.screen, st_lb=False)
         win_main_panel = [
-            Programs.Window(200, self.dysplay_hight-80, 100, 80, 0, self.color["red"], self.screen, lambda: pan1.change(True), "деньги-blue"),
-            Programs.Window(0, self.dysplay_hight-80, 100, 80, 0, self.color["red"], self.screen, lambda: exit(), "exit-blue"),
-            Programs.Window(500, self.dysplay_hight-80, 100, 80, 0, self.color["red"], self.screen, lambda: calculation.change(True), "calc-blue"),
+            Programs.Window(200, self.dysplay_hight-80, 100, 80, 0, self.color["custom1"], self.screen, lambda: pan1.change(True), "деньги-black"),
+            Programs.Window(0, self.dysplay_hight-80, 100, 80, 0, self.color["custom1"], self.screen, lambda: exit(), "exit-black"),
+            Programs.Window(500, self.dysplay_hight-80, 100, 80, 0, self.color["custom1"], self.screen, lambda: calculation.change(True), "calc-black"),
 
         ]
         main_panel.window = win_main_panel
@@ -62,7 +64,7 @@ class Desktop(Programs.programs):
 
 
         while True:
-            pygame.time.Clock().tick(180)
+            pygame.time.Clock().tick(60)
 
             calculation.otr()
             pan1.otr()
@@ -84,16 +86,13 @@ class Desktop(Programs.programs):
                     if event.button == 1:
                         self.draw = True
                         self.test = True
-                        # pan1.check_tap(event.pos)
-                        # calculation.check_tap(event.pos)
-                        # main_panel.check_tap(event.pos)
+                        # pan1.check_tap(event.pos, self.pos_cursor, self.test)
+                        # calculation2.check_tap(event.pos, self.pos_cursor, self.test)
+                        # main_panel.check_tap(event.pos, self.pos_cursor, self.test)
 
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1:
                         self.draw = False
-
-
-
 
                 if self.draw:
                     pan1.check_tap(event.pos, self.pos_cursor, self.test)
