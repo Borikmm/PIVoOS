@@ -4,14 +4,11 @@ import time
 import random
 from pygame.color import THECOLORS
 import Programs
-
-# for debigung
 pygame.init()
 
 class Desktop(Programs.programs):
 
     dysplay_width, dysplay_hight = pygame.display.Info().current_w, pygame.display.Info().current_h
-    print(dysplay_hight)
 
     color = {
         "black": [0, 0, 0],
@@ -38,38 +35,25 @@ class Desktop(Programs.programs):
         # background color
         self.screen.fill(THECOLORS['black'])
 
-
-
-        pan1 = Programs.Panel(200, 100, 200, 500, 0, self.color["white"], self.screen, True)
-        win1 = [Programs.Window(300, 400, 100, 100, 2, self.color["blue"], self.screen, lambda: exit(), "exit-red"),
-                Programs.Window(300, 200, 100, 100, 2, self.color["red"], self.screen, lambda: print("hello world"))]
-        pan1.window = win1
-        pan1.DRAW = False
-
-        calculation = Programs.Panel(150, 100, 500, 500, 0, self.color["white"], self.screen, True)
-        win2 = Programs.Calculator(200, 250, 60, 60, 20, self.screen)()
-        calculation.window = win2
-        calculation.DRAW = False
-
-
-        main_panel = Programs.Panel(x=0, y=self.dysplay_hight-80, width=self.dysplay_width, height=80, border=0, color=self.color["white"], screen=self.screen, st_lb=False)
-        win_main_panel = [
-            Programs.Window(200, self.dysplay_hight-80, 100, 80, 0, self.color["custom1"], self.screen, lambda: pan1.change(True), "деньги-black"),
-            Programs.Window(0, self.dysplay_hight-80, 100, 80, 0, self.color["custom1"], self.screen, lambda: exit(), "exit-black"),
-            Programs.Window(500, self.dysplay_hight-80, 100, 80, 0, self.color["custom1"], self.screen, lambda: calculation.change(True), "calc-black"),
-
-        ]
-        main_panel.window = win_main_panel
-        main_panel.DRAW = True
+        self.create_dynamic_panels()
 
 
         while True:
-            pygame.time.Clock().tick(60)
 
-            calculation.otr()
-            pan1.otr()
-            main_panel.otr()
+            clock = time.time()
 
+            hour = time.localtime(clock).tm_hour if len(str(time.localtime(clock).tm_hour)) == 2 else f"{0}{time.localtime(clock).tm_hour}"
+            min = time.localtime(clock).tm_minmin if len(str(time.localtime(clock).tm_min)) == 2 else f"{0}{time.localtime(clock).tm_min}"
+            sec = time.localtime(clock).tm_sec if len(str(time.localtime(clock).tm_sec)) == 2 else f"{0}{time.localtime(clock).tm_sec}"
+            self.struct = f"{hour}:{min}:{sec}"
+
+            self.create_static_panels()
+
+            pygame.time.Clock().tick(180)
+
+            for i in [self.calculation, self.pan1, self.main_panel]:
+                if i.DRAW:
+                    i.otr()
 
             for event in pygame.event.get():
                     # pygame.draw.circle(self.screen, self.color["blue"], event.pos, 20)
@@ -95,13 +79,44 @@ class Desktop(Programs.programs):
                         self.draw = False
 
                 if self.draw:
-                    pan1.check_tap(event.pos, self.pos_cursor, self.test)
-                    calculation.check_tap(event.pos, self.pos_cursor, self.test)
-                    main_panel.check_tap(event.pos, self.pos_cursor, self.test)
+                    self.pan1.check_tap(event.pos, self.pos_cursor, self.test)
+                    self.calculation.check_tap(event.pos, self.pos_cursor, self.test)
+                    self.main_panel.check_tap(event.pos, self.pos_cursor, self.test)
                     self.test = False
-
-
 
 
             pygame.display.flip()
             self.screen.fill(self.color["black"])
+
+    def create_dynamic_panels(self):
+        self.pan1 = Programs.Panel(200, 100, 200, 500, 0, self.color["white"], self.screen, True)
+        win1 = [Programs.Window(300, 400, 100, 100, 2, self.color["blue"], self.screen, lambda: exit(), "exit-red"),
+                Programs.Window(300, 200, 100, 100, 2, self.color["red"], self.screen,
+                                lambda: print("hello world"))]
+        self.pan1.window = win1
+        self.pan1.DRAW = False
+
+        self.calculation = Programs.Panel(150, 100, 500, 500, 0, self.color["white"], self.screen, True)
+        win2 = Programs.Calculator(200, 250, 60, 60, 20, self.screen)()
+        self.calculation.window = win2
+        self.calculation.DRAW = False
+
+        self.main_panel = Programs.Panel(x=0, y=self.dysplay_hight - 80, width=self.dysplay_width, height=80, border=0,
+                                    color=self.color["white"], screen=self.screen, st_lb=False)
+
+    def create_static_panels(self):
+        win_main_panel = [
+            Programs.Window(200, self.dysplay_hight - 80, 100, 80, 0, self.color["custom1"], self.screen,
+                            lambda: self.pan1.change(True), "деньги-black"),
+            Programs.Window(0, self.dysplay_hight - 80, 100, 80, 0, self.color["custom1"], self.screen,
+                            lambda: exit(), "exit-black"),
+            Programs.Window(500, self.dysplay_hight - 80, 100, 80, 0, self.color["custom1"], self.screen,
+                            lambda: self.calculation.change(True), "calc-black"),
+            Programs.Text(self.dysplay_width - 150,
+                          self.dysplay_hight - 60,
+                          self.struct,
+                          self.color["custom1"], self.screen)
+        ]
+        self.main_panel.window = win_main_panel
+        self.main_panel.DRAW = True
+

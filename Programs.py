@@ -156,6 +156,29 @@ class Calculator:
         return self.create_subwindows(*args)
 
 
+class Text:
+    def __init__(self, x, y, text, color, screen, command=None):
+        self.text = text
+        self.x = x
+        self.y = y
+
+
+        self.color = color
+        self.screen = screen
+
+        self.command = command
+
+    def otr(self):
+        font = pygame.font.SysFont('arial', 36)
+        text1 = font.render(self.text, True,
+                          self.color)
+        self.screen.blit(text1, (self.x, self.y))
+
+    def check_tap(self, pos_cursor, pos2=None, draw=None):
+        pass
+
+
+
 
 
 
